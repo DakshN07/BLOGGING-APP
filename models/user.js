@@ -33,18 +33,37 @@ const userSchema = new Schema({
 {timestamps : true}
 );
 
-userSchema.pre('Save', function(next){
+userSchema.pre('save', function(next){
     const user = this;
 
-    if(!user.isModified("password")) return;
+    console.log("Before saving user:", user);
 
-    const salt = randomBytes(16). toString();
-    const hashedPassword = createHmac("sha256", salt)
-    .update(user.password)
-    .digest("hex");
+    if(!user.isModified("password")) return next();
 
-    this.salt = salt;
-    this.password = hashedPassword;
+    if (!user.password) {
+        return next(new Error("Password is required"));
+    }
+
+    const salt = randomBytes(16).toString('hex');
+    console.log("Generated Salt:", salt);
+
+    console.log("User  Password before hashing:", user.password); 
+
+    try {
+        // Hash the password with the salt
+        const hashedPassword = createHmac("sha256", salt)
+            .update(user.password)
+            .digest("hex");
+
+        // Store the salt and hashed password
+        this.salt = salt;
+        this.password = hashedPassword;
+
+        console.log("Hashed Password:", hashedPassword); // Log the hashed password
+        next(); // Proceed to save the user
+    } catch (error) {
+        return next(error); // Pass any errors to the next middleware
+    }
 });
 
 userSchema.static("matchPasswordAndGenerateToken", async function(email, password){
@@ -52,17 +71,21 @@ userSchema.static("matchPasswordAndGenerateToken", async function(email, passwor
     if(!user) throw new Error ("User Not Found");
 
     const salt = user.salt;
-    const hashedPassword = user.password;
+    console.log("Salt:", salt);
 
+    const hashedPassword = user.password;
+    if (!salt) throw new Error("User  salt is not defined");
+
+    console.log("Password:", password);
     const userProvidedHash = createHmac("sha256", salt)
     .update(password)
     .digest("hex");
 
-    if(userProvidedHash !== hashedPassword) throw new error ("Incorrect Passsword");
+    if(userProvidedHash !== hashedPassword) throw new Error ("Incorrect Passsword");
 
     const token = createTokenForUser(user)
     return token;
-})
+});
 
 const User = model('user', userSchema);
 

@@ -2,25 +2,21 @@
 <html lang="en">
 <head>
     <%-include('./partials/head') %>
-    <title>HomePage</title>
+    <title>Blogify | Home</title>
 </head>
 <body>
-    <%-include('./partials/scripts') %>
     <%-include('./partials/nav') %>
-        <!-- <div class="card" style="width: 18rem;">
-            <img src="<%= blog.coverImageURL %>" class="card-img-top" />
-            <div class="card-body">
-              <h5 class="card-title">Card title</h5>
-
-              <a href="/blog/<%= blog._id %>" class="btn btn-primary">View</a>
-            </div>
-          </div> -->
-          <div class="card mt-3 ms-3" style="width: 18rem; padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 0.5rem; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
-            <img src="<%= blog.coverImageURL %>" class="card-img-top" style="border-radius: 0.5rem 0.5rem 0 0;" />
-            <div class="card-body">
-                <h5 class="card-title" style="color: #343a40;">Card title</h5>
-                <a href="/blog/<%= blog._id %>" class="btn btn-primary">View</a>
-            </div>
+        <div class="container mt-3">
+          <% blog.forEach(blog => { %>
+            <div class="card mt-3 md-3 mb-3" style="width: 18rem; padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 0.5rem; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+              <img src="<%= blog.coverImageURL %>" class="card-img-top" style="border-radius: 0.5rem 0.5rem 0 0;" />
+              <div class="card-body">
+                  <h5 class="card-title" style="color: #343a40;"><%= blog.title %></h5>
+                  <a href="/blog/<%= blog._id %>" class="btn btn-primary">View</a>
+              </div>
+          </div>
+          <% }) %>
+          <%-include('./partials/scripts') %>
         </div>
 </body>
 </html>

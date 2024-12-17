@@ -5,8 +5,7 @@
     <title>Blogify | Add Blog</title>
 </head>
 <body>
-    <%-include('./partials/scripts') %>  <%-
-    include('./partials/nav') %>
+    <%- include('./partials/nav') %>
 
 <div class="container mt-3">
     <form action="/blog" method="post" enctype="multipart/form-data">
@@ -37,5 +36,6 @@
         </div>
     </form>
 </div>
+<%-include('./partials/scripts') %>  
 </body>
 </html>

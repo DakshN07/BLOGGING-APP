@@ -1,26 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <%-include('./partials/head') %>
-    <title>Blogify | Signin</title>
+  <%-include('./partials/head') %>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
+    <title>Blogify | Sign In</title>
 </head>
 <body>
-    <%-include('./partials/nav') %>
-<div class="container mt-4">
-    <form action = '/user/Signin' method="post">
-        <div class="mb-3">
-          <label for="exampleInputEmail1" class="form-label">Email address</label>
-          <input type="email" class="form-control" id="exampleInputEmail1" name = "email" aria-describedby="emailHelp">
-          <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
-        </div>
-        <div class="mb-3">
-          <label for="exampleInputPassword1" class="form-label">Password</label>
-          <input type="password" class="form-control" name = "password" id="exampleInputPassword1">
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </form>
-</div>
-
+  <%-include('./partials/nav') %>
+    <header>
+        <h2>Sign In</h2>
+    </header>
+    <div class="container">
+        <form action="/user/signin" method="POST">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <input type="submit" value="Sign In">
+        </form>
+        <% if (Error) { %>
+            <p style="color: red;"><%= Error.message || Error %></p>
+        <% } %>
+    </div>
     <%-include('./partials/scripts') %>
 </body>
 </html>
+
+

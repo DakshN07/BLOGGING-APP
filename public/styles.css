@@ -1,0 +1,142 @@
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+}
+
+header {
+    background: #35424a;
+    color: #ffffff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+h1 {
+    margin: 0;
+}
+
+form {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+input[type="submit"] {
+    background: #35424a;
+    color: #ffffff;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+input[type="submit"]:hover {
+    background: #2c3e50;
+}
+
+.blog-post {
+    background: #ffffff;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.comment {
+    background: #f9f9f9;
+    padding: 10px;
+    margin: 10px 0;
+    border-left: 3px solid #35424a;
+}
+/* Custom File Input Styles */
+.custom-file {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.custom-file-input {
+    display: none; /* Hide the default file input */
+}
+
+.custom-file-label {
+    display: block;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.custom-file-label:hover {
+    border-color: #35424a; /* Change border color on hover */
+}
+
+.custom-file-label::after {
+    content: "Browse";
+    background-color: #35424a;
+    color: #ffffff;
+    padding: 10px;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+}
+
+.custom-file-label.selected {
+    background-color: #e9ecef; /* Change background when a file is selected */
+    border-color: #35424a;
+}
+.blog-subtitle {
+    background-color: #35424a; /* Dark background */
+    color: #ffffff; /* White text */
+    padding: 15px 20px; /* Padding around the text */
+    border-radius: 5px; /* Rounded corners */
+    text-align: center; /* Center the text */
+    font-family: 'Arial', sans-serif; /* Font style */
+    margin: 20px 0; /* Margin above and below */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+.animated-underline {
+    position: relative; /* Positioning for the underline */
+    display: inline-block; /* Inline block for width */
+    color: #35424a; /* Text color */
+    font-size: 24px; /* Font size */
+    margin: 20px 0; /* Margin above and below */
+}
+
+.animated-underline::after {
+    content: ''; /* Empty content for the underline */
+    position: absolute; /* Positioning */
+    left: 0; /* Align to the left */
+    bottom: 0; /* Align to the bottom */
+    height: 4px; /* Height of the underline */
+    width: 100%; /* Full width */
+    background: #ff7e5f; /* Underline color */
+    transform: scaleX(0); /* Initial scale */
+    transition: transform 0.3s ease; /* Transition effect */
+}
+
+.animated-underline:hover::after {
+    transform: scaleX(1); /* Scale to full width on hover */
+}

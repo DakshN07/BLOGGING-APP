@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
-    <%-include('./partials/head') %>
+    
     <title>Blogify | Add Blog</title>
 </head>
 <body>
-    <%- include('./partials/nav') %>
+    
 
 <div class="container mt-3">
     <form action="/blog" method="post" enctype="multipart/form-data">
@@ -36,6 +36,55 @@
         </div>
     </form>
 </div>
-<%-include('./partials/scripts') %>  
+ 
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%-include('./partials/head') %>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
+    <title>Blogify | Add Blog</title>
+</head>
+<body>
+    <%- include('./partials/nav') %>
+    <header>
+        <h1>Add New Blog</h1>
+    </header>
+    <div class="container">
+        <form action="/blog" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="coverImage" class="form-label">Cover Image</label>
+                <div class="custom-file">
+                    <input 
+                        type="file" 
+                        class="custom-file-input" 
+                        id="coverImage" 
+                        name="coverImage" 
+                        aria-describedby="coverImage" 
+                        accept="image/*" 
+                        onchange="updateFileName()"/>
+                    <label class="custom-file-label" for="coverImage">Choose file...</label>
+                </div>
+                <small class="form-text text-muted">Upload a cover image (JPEG, PNG, etc.)</small>
+            </div>
+            <input type="text" name="title" placeholder="Blog Title" required>
+            <textarea name="body" placeholder="Blog Content" required></textarea>
+            <input type="submit" value="Add Blog">
+        </form>
+    </div>
+    <script>
+        function updateFileName() {
+            const input = document.getElementById('coverImage');
+            const label = document.querySelector('.custom-file-label');
+            const fileName = input.files[0] ? input.files[0].name : 'Choose file...';
+            label.textContent = fileName;
+            label.classList.add('selected');
+        }
+        </script>
+    <%-include('./partials/scripts') %>
 </body>
 </html>

@@ -30,10 +30,10 @@
           <%-include('./partials/scripts') %>
         </div>
 </body>
-</html> -->
+</html> --> 
 
 
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <%-include('./partials/head') %>
@@ -60,7 +60,7 @@
                   <h5 class="card-title" style="color: #343a40;"><%= blog.title %></h5>
                   <a href="/blog/<%= blog._id %>" class="btn btn-primary">View</a>
               </div>
-          </div> -->
+          </div>
           <div class="card blog-card" style="padding: 15px; background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 0.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); transition: transform 0.2s, box-shadow 0.2s;">
             <img src="<%= blog.coverImageURL %>" class="card-img-top" style="border-radius: 0.5rem 0.5rem 0 0; filter: brightness(0.9); transition: filter 0.3s;" onmouseover="this.style.filter='brightness(1)'" onmouseout="this.style.filter='brightness(0.9)'" />
             <div class="card-body" style="background-color: #f8f9fa; border-radius: 0 0 0.5rem 0.5rem;">
@@ -71,5 +71,114 @@
           <% }) %>
           <%-include('./partials/scripts') %>
         </div>
+</body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/head') %>
+    <title>Blogify | Home</title>
+    <style>
+        body {
+            background-color: #141414;
+            color: #ffffff;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin: 20px;
+            font-weight: bold;
+        }
+
+        .blog-row {
+            display: flex;
+            overflow-x: auto;
+            padding: 20px;
+            gap: 20px;
+            scroll-snap-type: x mandatory;
+        }
+
+        .blog-card {
+            flex: 0 0 auto;
+            width: 300px;
+            scroll-snap-align: start;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #222;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            transition: transform 0.3s ease;
+        }
+
+        .blog-card:hover {
+            transform: scale(1.08);
+            z-index: 10;
+        }
+
+        .blog-card img {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .blog-card .card-body {
+            padding: 15px;
+        }
+
+        .blog-card h5 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .blog-card a.btn {
+            background-color: #e50914;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.2s;
+        }
+
+        .blog-card a.btn:hover {
+            background-color: #f40612;
+        }
+
+        .blog-row::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .blog-row::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <%- include('./partials/nav') %>
+
+    <div class="container-fluid">
+        <div class="section-title">Latest Blogs</div>
+        <div class="blog-row">
+            <% blog.forEach(blog => { %>
+                <div class="blog-card">
+                    <img src="<%= blog.coverImageURL %>" alt="Blog Cover">
+                    <div class="card-body">
+                        <h5><%= blog.title %></h5>
+                        <a href="/blog/<%= blog._id %>" class="btn">View</a>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+
+    <%- include('./partials/scripts') %>
 </body>
 </html>

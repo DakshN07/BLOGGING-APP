@@ -16,6 +16,10 @@ const PORT = process.env.PORT || 8000;
 
 const uri = process.env.MONGO_URL;
 console.log('MongoDB URI:', uri);
+mongoose.connect(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,

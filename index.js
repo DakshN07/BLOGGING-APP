@@ -9,7 +9,6 @@ const Blog = require('./models/blog');
 const userRoute = require('./routes/user');
 const blogRoute = require('./routes/blog');
 
-
 const { checkForAuthenticationCookie } = require("./middleware/authentication");
 
 const app = express();
@@ -17,6 +16,11 @@ const PORT = process.env.PORT || 8000;
 
 const uri = process.env.MONGO_URL;
 console.log('MongoDB URI:', uri);
+
+mongoose.connect(process.env.MONGO_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
 
 mongoose
     .connect(process.env.MONGO_URL)
@@ -37,6 +41,7 @@ app.get("/", async (req, res)=>{
         blog: allBlogs,
     });
 });
+
 
 app.use("/user", userRoute);
 app.use("/blog", blogRoute);

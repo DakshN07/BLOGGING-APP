@@ -1,9 +1,9 @@
 const { Router } = require("express");
 const multer = require("multer");
-const path = require("path");
 
 const Blog = require("../models/blog");
 const Comment = require("../models/comment");
+const { summarizeFallback } = require("../utils/aiSummary");
 const router = Router();
 
 const storage = require("../utils/storage"); // Cloudinary storage
@@ -47,6 +47,7 @@ router.post("/", upload.single("coverImage"), async (req, res) => {
   const blog = await Blog.create({
     body,
     title,
+    summary: summarizeFallback(body),
     createdBy: req.user._id,
     coverImageURL: req.file.path, // Cloudinary URL
   });

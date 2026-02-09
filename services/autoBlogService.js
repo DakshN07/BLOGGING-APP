@@ -1,0 +1,189 @@
+const Blog = require("../models/blog");
+const { generateSummary, summarizeFallback } = require("../utils/aiSummary");
+
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+const MIN_NEW_BLOGS = 3;
+
+const FEEDS = [
+  {
+    name: "DEV Community (AI)",
+    url: "https://dev.to/feed/tag/ai",
+    category: "AI",
+  },
+  {
+    name: "DEV Community (Engineering)",
+    url: "https://dev.to/feed/tag/engineering",
+    category: "Engineering",
+  },
+  {
+    name: "DEV Community (Technology)",
+    url: "https://dev.to/feed/tag/technology",
+    category: "Technology",
+  },
+  {
+    name: "Google AI Blog",
+    url: "https://blog.google/technology/ai/rss/",
+    category: "AI",
+  },
+  {
+    name: "MIT Technology Review (AI)",
+    url: "https://www.technologyreview.com/topic/artificial-intelligence/feed/",
+    category: "AI",
+  },
+];
+
+const FALLBACK_COVER =
+  "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80";
+
+let isRunning = false;
+
+const normalizeText = (value) => (value || "").replace(/\s+/g, " ").trim();
+
+const stripCdata = (value) =>
+  (value || "").replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1");
+
+const decodeHtml = (value) =>
+  stripCdata(value)
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+
+const extractTag = (block, tag) => {
+  const regex = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "i");
+  const match = block.match(regex);
+  return match ? decodeHtml(match[1]).trim() : "";
+};
+
+const extractAtomLink = (block) => {
+  const linkRegex = /<link[^>]*href=["']([^"']+)["'][^>]*>/i;
+  const match = block.match(linkRegex);
+  return match ? match[1] : "";
+};
+
+const extractMediaUrl = (block) => {
+  const mediaRegex = /<(media:content|enclosure)[^>]*url=["']([^"']+)["'][^>]*>/i;
+  const match = block.match(mediaRegex);
+  return match ? match[2] : "";
+};
+
+const parseFeedItems = (xml) => {
+  const itemMatches = Array.from(xml.matchAll(/<item>([\s\S]*?)<\/item>/gi));
+  const entryMatches = Array.from(xml.matchAll(/<entry>([\s\S]*?)<\/entry>/gi));
+  const blocks = itemMatches.length ? itemMatches.map((m) => m[1]) : entryMatches.map((m) => m[1]);
+
+  return blocks.map((block) => {
+    const title = extractTag(block, "title");
+    const link = extractTag(block, "link") || extractAtomLink(block);
+    const summary =
+      extractTag(block, "description") ||
+      extractTag(block, "summary") ||
+      extractTag(block, "content");
+    const date = extractTag(block, "pubDate") || extractTag(block, "updated");
+    const categories = Array.from(block.matchAll(/<category[^>]*>([\s\S]*?)<\/category>/gi)).map(
+      (match) => decodeHtml(match[1]).trim()
+    );
+    const mediaUrl = extractMediaUrl(block);
+
+    return {
+      title,
+      link,
+      summary,
+      date,
+      categories,
+      mediaUrl,
+    };
+  });
+};
+
+const buildTags = (item, feedCategory) => {
+  const tags = new Set([feedCategory]);
+  if (Array.isArray(item.categories)) {
+    item.categories.forEach((category) => tags.add(normalizeText(category)));
+  }
+  return Array.from(tags).filter(Boolean).slice(0, 6);
+};
+
+const buildBody = (item) => {
+  const raw = normalizeText(item.summary || "");
+  if (!raw) {
+    return "This curated article brings the latest insights in tech, engineering, and AI. Open the source to read the full story and dive deeper.";
+  }
+  return raw;
+};
+
+const pickCoverImage = (item) => item.mediaUrl || FALLBACK_COVER;
+
+const fetchFeed = async (feedUrl) => {
+  const response = await fetch(feedUrl);
+  if (!response.ok) {
+    throw new Error(`Feed request failed with status ${response.status}`);
+  }
+  return response.text();
+};
+
+const ensureMinimumCuratedBlogs = async () => {
+  if (isRunning) return;
+  isRunning = true;
+
+  try {
+    let createdCount = 0;
+
+    for (const feed of FEEDS) {
+      if (createdCount >= MIN_NEW_BLOGS) break;
+
+      let xml;
+      try {
+        xml = await fetchFeed(feed.url);
+      } catch (error) {
+        console.error(`Failed to fetch feed ${feed.url}:`, error.message);
+        continue;
+      }
+
+      const items = parseFeedItems(xml).slice(0, 8);
+      for (const item of items) {
+        if (createdCount >= MIN_NEW_BLOGS) break;
+        if (!item.link || !item.title) continue;
+
+        const existing = await Blog.findOne({ sourceUrl: item.link }).lean();
+        if (existing) continue;
+
+        const body = buildBody(item);
+        const summary = await generateSummary(item.title, body, feed.category);
+        const summaryText = summary || summarizeFallback(body);
+
+        await Blog.create({
+          title: item.title,
+          body,
+          summary: summaryText,
+          coverImageURL: pickCoverImage(item),
+          sourceUrl: item.link,
+          sourceName: feed.name,
+          sourcePublishedAt: item.date ? new Date(item.date) : null,
+          categories: buildTags(item, feed.category),
+          isAutoGenerated: true,
+        });
+
+        createdCount += 1;
+      }
+    }
+
+    if (createdCount < MIN_NEW_BLOGS) {
+      console.warn(
+        `Auto-curation completed with ${createdCount} new blogs (target: ${MIN_NEW_BLOGS}).`
+      );
+    } else {
+      console.log(`Auto-curation added ${createdCount} new blogs.`);
+    }
+  } finally {
+    isRunning = false;
+  }
+};
+
+const startAutoBlogService = () => {
+  ensureMinimumCuratedBlogs();
+  setInterval(ensureMinimumCuratedBlogs, WEEK_MS);
+};
+
+module.exports = { startAutoBlogService };
